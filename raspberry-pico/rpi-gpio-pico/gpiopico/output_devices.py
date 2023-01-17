@@ -5,12 +5,12 @@ from gpiopico.utils import AnalogicMap
 _SAMPLES: int = 65534
 
 
-class DigitalSimpleControl:
+class SimpleDigitalControl:
     """
         :pin(int)
         :inverted_logic(bool)
         
-        led = DigitalSimpleControl(2, inverted_logic=True)
+        led = SimpleDigitalControl(2, inverted_logic=True)
         print('ON')
         led.change_state(True)
         sleep(2)
@@ -44,13 +44,13 @@ class DigitalSimpleControl:
            1 if self._inverted_logic else 0
         )
 
-class DigitalFullControl:
+class FullDigitalControl:
     """
         :pin(int)
         :inverted_logic(bool)
         :use_mapping(bool)
         
-        led = DigitalFullControl(2, inverted_logic=True)
+        led = FullDigitalControl(2, inverted_logic=True)
         led = Led(2, True)
         led.on()
         sleep(2)
@@ -109,15 +109,15 @@ class DigitalFullControl:
         )
             
 
-class Relay(DigitalSimpleControl):
+class Relay(SimpleDigitalControl):
     def __init__(self, pin: int, inverted_logic: bool = False):
         super().__init__(pin, inverted_logic)
 
-class Led(DigitalFullControl):
+class Led(FullDigitalControl):
     def __init__(self, pin: int, inverted_logic: bool = False):
         super().__init__(pin, inverted_logic)
 
-class SolidStateRelay(DigitalFullControl):
+class SolidStateRelay(FullDigitalControl):
     def __init__(self, pin: int, inverted_logic: bool = False) -> None:
         super().__init__(pin, inverted_logic)
 
@@ -135,8 +135,8 @@ class Motor:
         motor_a.stop()
     """
     def __init__(self, pin_forward: int, pin_backward: int) -> None:
-        self._pin_forward = DigitalFullControl(pin_forward)
-        self._pin_backward = DigitalFullControl(pin_backward)
+        self._pin_forward = FullDigitalControl(pin_forward)
+        self._pin_backward = FullDigitalControl(pin_backward)
         self._limit_range = 100
         self.stop()
         
@@ -169,3 +169,10 @@ class Motor:
         self._pin_backward.off()
         sleep(0.5)
 
+class Car:
+    """Basic Car with two motors
+    """
+    def __init__(self, motor_a:tuple, motor_b:tuple) -> None:
+        self._motor_a = Motor(motor_a[0], motor_a[1])
+        self._motor_b = Motor(motor_b[0], motor_b[1])
+    #TODO Create methods
