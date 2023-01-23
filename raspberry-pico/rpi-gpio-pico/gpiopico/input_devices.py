@@ -160,3 +160,20 @@ class Joystick(AnalogicInputs):
 class LM35(AnalogicInputs):
     pass
 
+class PIR:
+    def __init__(
+        self,
+        pin
+    ) -> None:
+        self._input = Pin(pin, Pin.IN, Pin.PULL_UP)
+        self._when_motion_is_detected = None
+        self._when_is_it_on_hold = None
+        self._value = None
+
+    @property
+    def value(self):
+        return self._input.value()
+
+    @property
+    def motion_detection(self):
+        pass
