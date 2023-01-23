@@ -167,7 +167,7 @@ class PIR:
     ) -> None:
         self._input = Pin(pin, Pin.IN, Pin.PULL_UP)
         self._when_motion_is_detected = None
-        self._when_is_it_on_hold = None
+        self._when_on_hold = None
         self._value = None
 
     @property
@@ -177,3 +177,7 @@ class PIR:
     @property
     def motion_detection(self):
         pass
+
+class Button:
+    def __init__(self, pin) -> None:
+        self._input = Pin(pin, Pin.IN, Pin.PULL_UP)
