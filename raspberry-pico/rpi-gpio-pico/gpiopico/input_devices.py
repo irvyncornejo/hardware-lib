@@ -163,20 +163,58 @@ class LM35(AnalogicInputs):
 class PIR:
     def __init__(
         self,
-        pin
+        pin: int,
+        show_value: bool = False
     ) -> None:
         self._input = Pin(pin, Pin.IN, Pin.PULL_UP)
         self._when_motion_is_detected = None
-        self._when_on_hold = None
         self._value = None
+        self._show_value = show_value
+        self._count = 0
 
     @property
     def value(self):
         return self._input.value()
 
     @property
-    def motion_detection(self):
-        pass
+    def when_motion_is_detected(self):
+        return self._when_motion_is_detected
+    
+    @when_motion_is_detected.setter
+    def when_motion_is_detected(self, callback):
+        if (
+            type(callback).__name__ == 'function' or
+            type(callback).__name__ == 'bound_method'
+        ):
+            self._when_motion_is_detected = callback
+        else:
+            raise ValueError('callback will be a function or bound_method')
+    
+    def active_motion_detection(self):
+        self._value = self._input.value()
+        print(self._value)
+        if (
+            self._when_motion_is_detected and
+            self._input.value() == 1
+        ):
+            self._count += 1
+            self._when_motion_is_detected()
+            print(self._count)
+            return
+        (print(self._value) if self._show_value else None)
+        sleep(0.3)
+        return self._value
+
+class Red:
+    def test(self):
+        print('Algo se movió')
+
+if __name__=='__main__':
+    sensor_pir = PIR(2)
+    t = Red().test
+    sensor_pir.when_motion_is_detected = t
+    while True:
+        sensor_pir.active_motion_detection()
 
 class Button:
     def __init__(self, pin) -> None:
