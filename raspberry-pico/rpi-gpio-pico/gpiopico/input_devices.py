@@ -160,6 +160,10 @@ class Joystick(AnalogicInputs):
 class LM35(AnalogicInputs):
     pass
 
+class Button:
+    def __init__(self, pin) -> None:
+        self._input = Pin(pin, Pin.IN, Pin.PULL_UP)
+
 class PIR:
     def __init__(
         self,
@@ -170,7 +174,6 @@ class PIR:
         self._when_motion_is_detected = None
         self._value = None
         self._show_value = show_value
-        self._count = 0
 
     @property
     def value(self):
@@ -192,18 +195,16 @@ class PIR:
     
     def active_motion_detection(self):
         self._value = self._input.value()
-        print(self._value)
         if (
             self._when_motion_is_detected and
-            self._input.value() == 1
+            self._value == 1
         ):
-            self._count += 1
             self._when_motion_is_detected()
-            print(self._count)
-            return
+
         (print(self._value) if self._show_value else None)
         sleep(0.3)
         return self._value
+
 
 class Red:
     def test(self):
@@ -215,7 +216,3 @@ if __name__=='__main__':
     sensor_pir.when_motion_is_detected = t
     while True:
         sensor_pir.active_motion_detection()
-
-class Button:
-    def __init__(self, pin) -> None:
-        self._input = Pin(pin, Pin.IN, Pin.PULL_UP)
