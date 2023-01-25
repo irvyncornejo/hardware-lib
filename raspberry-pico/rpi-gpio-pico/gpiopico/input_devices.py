@@ -161,8 +161,36 @@ class LM35(AnalogicInputs):
     pass
 
 class Button:
-    def __init__(self, pin) -> None:
+    def __init__(
+        self,
+        pin: int,
+        show_value: bool = False
+    ) -> None:
         self._input = Pin(pin, Pin.IN, Pin.PULL_UP)
+        self._when_pressed = None
+        self._show_value = show_value
+
+
+    @property
+    def when_pressed(self):
+        return self._when_pressed
+    
+    @when_pressed.setter
+    def when_pressed(self, callback):
+        if (
+            type(callback).__name__ == 'function' or
+            type(callback).__name__ == 'bound_method'
+        ):
+            self._when_pressed = callback
+        else:
+            raise ValueError('callback will be a function or bound_method')
+    
+    def check_state(self):
+        _value = self._input.value()
+        if self._when_pressed and _value == 0:
+            self._when_pressed
+        (print(_value) if self._show_value else None)
+        sleep(0.3)
 
 class PIR:
     def __init__(
