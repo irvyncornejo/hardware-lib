@@ -88,7 +88,6 @@ class FullDigitalControl:
                     self._range_map[1]
                 )
             )
-            print(_pwm_value)
             _pwm_value = (
                 _pwm_value if self._inverted_logic else _pwm_value
             )
@@ -170,9 +169,13 @@ class Motor:
         sleep(0.5)
 
 class Car:
+    #TODO Create methods
     """Basic Car with two motors
     """
     def __init__(self, motor_a:tuple, motor_b:tuple) -> None:
         self._motor_a = Motor(motor_a[0], motor_a[1])
         self._motor_b = Motor(motor_b[0], motor_b[1])
-    #TODO Create methods
+
+class RGB:
+    #TODO Define class
+    pass

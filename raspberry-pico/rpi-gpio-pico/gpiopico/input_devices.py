@@ -164,33 +164,52 @@ class Button:
     def __init__(
         self,
         pin: int,
+        invert_logic: bool = False,
         show_value: bool = False
     ) -> None:
         self._input = Pin(pin, Pin.IN, Pin.PULL_UP)
         self._when_pressed = None
+        self._on_hold = None
         self._show_value = show_value
+        self._value = 1 if not invert_logic else 0
 
-
+    @staticmethod
+    def _validate_callback(callback):
+        if (
+            type(callback).__name__ == 'function' or
+            type(callback).__name__ == 'bound_method'
+        ):
+            return
+        else:
+            raise ValueError('callback will be a function or bound_method')
+        
+    
     @property
     def when_pressed(self):
         return self._when_pressed
     
     @when_pressed.setter
     def when_pressed(self, callback):
-        if (
-            type(callback).__name__ == 'function' or
-            type(callback).__name__ == 'bound_method'
-        ):
-            self._when_pressed = callback
-        else:
-            raise ValueError('callback will be a function or bound_method')
+        self._validate_callback(callback)
+        self._when_pressed = callback
+    
+    @property
+    def on_hold(self):
+        return self._on_hold
+    
+    @on_hold.setter
+    def on_hold(self, callback):
+        self._validate_callback(callback)
+        self._on_hold = callback
     
     def check_state(self):
         _value = self._input.value()
-        if self._when_pressed and _value == 0:
-            self._when_pressed
+        if self._when_pressed and _value == self._value:
+            self._when_pressed()
+        else:
+            if self._on_hold: self._on_hold()
         (print(_value) if self._show_value else None)
-        sleep(0.3)
+        sleep(0.1)
 
 class PIR:
     def __init__(
@@ -232,15 +251,3 @@ class PIR:
         (print(self._value) if self._show_value else None)
         sleep(0.3)
         return self._value
-
-
-class Red:
-    def test(self):
-        print('Algo se movió')
-
-if __name__=='__main__':
-    sensor_pir = PIR(2)
-    t = Red().test
-    sensor_pir.when_motion_is_detected = t
-    while True:
-        sensor_pir.active_motion_detection()

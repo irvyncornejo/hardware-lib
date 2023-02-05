@@ -8,16 +8,43 @@
 - LM35
 ### Ouput Devices
 - LED
-- Reley
+- Relay
 - Solid state relay
 - Motor DC
 - RGB
-- Servo motor
+- Servomotor
 
-
+### Blink
 ```python
 from gpiopico import Led
+from utime import sleep
 
-led1 = Led(2, True)
-led1.change_pwm(125) #value 0-255
+if __name__=='__main__':
+    led = Led(pin=0, inverted_logic=True)#common anode
+    
+    for _ in range(4):
+        led.on()
+        sleep(1)
+        led.off()
+        sleep(1)
+
+    for pwm in range(256):
+      led.pwm_value(pwm)#0-255
+      sleep(0.2)
+
+```
+### Button
+```python
+from gpiopico import Led, Button
+from utime import sleep
+
+if __name__=='__main__':
+    led = Led(pin=0, inverted_logic=True)#common anode
+    button = Button(pin=1)
+    
+    button.when_pressed = led.on
+    button.on_hold = led.off 
+    
+    while True:
+        button.check_state()
 ```
