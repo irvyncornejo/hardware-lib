@@ -48,7 +48,10 @@ GPIO control para raspberry pi pico
 - Motor DC
 - RGB
 - Servo motor
-
+###Descargar paquete
+```
+pip install gpiopico
+```
 
 ```python
 from gpiopico import Led
