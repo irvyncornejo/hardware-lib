@@ -43,7 +43,7 @@ GPIO control para raspberry pi pico
 - LM35
 ### Ouput Devices
 - LED
-- Reley
+- Relay
 - Solid state relay
 - Motor DC
 - RGB
