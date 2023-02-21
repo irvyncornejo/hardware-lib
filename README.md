@@ -13,7 +13,7 @@ Compress-Archive .\kaanbal-lib\*.* -DestinationPath .\kaanbal.zip -F
 $user="irvyn"
 Copy-Item -Path "C:\Users\$user\Documents\ic\hwlib\Kaanbal" -Destination "C:\Users\$user\Documents\Arduino\libraries" -Recurse -Force
 ```
-
+### Uso
 ```C++
 #include <Kaanbal.h>
 
@@ -48,11 +48,11 @@ GPIO control para raspberry pi pico
 - Motor DC
 - RGB
 - Servo motor
-###Descargar paquete
+### Descargar paquete
 ```
 pip install gpiopico
 ```
-
+### Uso
 ```python
 from gpiopico import Led
 
