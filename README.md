@@ -41,6 +41,7 @@ GPIO control para raspberry pi pico
 - Joystick
 - PIR
 - LM35
+- NextionDisplay
 ### Ouput Devices
 - LED
 - Relay
