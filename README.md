@@ -30,7 +30,6 @@ void loop() {
 }
 ```
 
-
 ## Raspberry pico o pico w
 * Python
 GPIO control para raspberry pi pico
@@ -41,7 +40,7 @@ GPIO control para raspberry pi pico
 - Joystick
 - PIR
 - LM35
-- NextionDisplay
+- Nextion Display
 ### Ouput Devices
 - LED
 - Relay
@@ -58,5 +57,6 @@ pip install gpiopico
 from gpiopico import Led
 
 led1 = Led(2, True)
+led1.on()
 led1.change_pwm(125) #value 0-255
 ```

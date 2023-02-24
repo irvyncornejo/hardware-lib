@@ -253,11 +253,22 @@ class PIR:
         return self._value
 
 class NextionDisplays:
-    
-    def __init__(self, tx:int, rx:int, bits:int=8, baudrate:int=9600)->None:
+    '''
+        display = NextionDisplays(tx=4, rx=5)
+        display.write("temp.txt='34 C'")
+    '''
+    def __init__(
+        self,
+        tx:int,
+        rx:int,
+        bits:int=8,
+        baudrate:int=9600,
+        parity=None,
+        stop:int=1
+    )->None:
         self._bits = bits
         self._uart = UART(1, baudrate=baudrate, tx=Pin(tx), rx=Pin(rx))
-        self._uart.init(bits=bits, parity=None, stop=1)
+        self._uart.init(bits=bits, parity=parity, stop=stop)
     
     def read(self):
         _data = self._uart.read()

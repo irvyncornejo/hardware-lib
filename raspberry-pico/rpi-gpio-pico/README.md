@@ -1,18 +1,25 @@
 # GPIO CONTROL IN RASPBERRY PI PICO
 ## Hardware control
+
 ### Input Devices
 - Touch Sensor
 - Potenciometer
 - Joystick
 - PIR
 - LM35
+- Nextion Display
 ### Ouput Devices
 - LED
 - Relay
 - Solid state relay
 - Motor DC
 - RGB
-- Servomotor
+- Servo motor
+### Descargar paquete
+```
+pip install gpiopico
+```
+
 
 ### Blink
 ```python
