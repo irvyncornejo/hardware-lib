@@ -34,7 +34,7 @@ class RotaryEncoder:
         self._CLK_Pin = Pin(clk_pin, Pin.IN, Pin.PULL_UP)
         self._SW = Pin(sw, Pin.IN, Pin.PULL_UP)
         self._wrapper: bool = wrapper
-        self._previousValue: int = 1
+        self._previous_value: int = 1
         self._max_step:int = max_step
     
     @property
@@ -46,13 +46,13 @@ class RotaryEncoder:
         return self._is_pressed
     
     def _read_rotatory_state(self) -> None:
-        if self._previousValue != self._CLK_Pin.value():
+        if self._previous_value != self._CLK_Pin.value():
             if not self._CLK_Pin.value():
                 if not self._DT_Pin.value():
                     self._value = (self._value - 1)%self._max_step
                 else:
                     self._value = (self._value + 1)%self._max_step
-            self._previousValue = self._CLK_Pin.value()
+            self._previous_value = self._CLK_Pin.value()
         
     def _read_button_state(self) -> None:
         if self._SW.value() == 0:
@@ -77,7 +77,7 @@ class AnalogicInputs:
         voltage_ref: float = _VOLTAGE_REF
     ) -> None:
         if adc_pin not in list(range(26,29)):
-            raise ValueError('adc_pin defined isn´t analogic pin')
+            raise ValueError('adc_pin defined it´s not analogic pin')
         self._input = ADC(adc_pin)
         self._conversion_factor = voltage_ref / _SAMPLES
 
@@ -155,7 +155,7 @@ class Joystick(AnalogicInputs):
             return 'Right'
         if self._ry_value < self._core_range[1]:
             return 'Left'
-        else: return None
+        else: return
 
 class LM35(AnalogicInputs):
     pass
@@ -183,7 +183,7 @@ class Button:
         else:
             raise ValueError('callback will be a function or bound_method')
         
-    
+
     @property
     def when_pressed(self):
         return self._when_pressed
@@ -249,7 +249,7 @@ class PIR:
             self._when_motion_is_detected()
 
         (print(self._value) if self._show_value else None)
-        sleep(0.3)
+        sleep(0.2)
         return self._value
 
 class NextionDisplays:
@@ -270,15 +270,28 @@ class NextionDisplays:
         self._uart = UART(1, baudrate=baudrate, tx=Pin(tx), rx=Pin(rx))
         self._uart.init(bits=bits, parity=parity, stop=stop)
     
-    def read(self):
-        _data = self._uart.read()
-        if _data and len(list(_data)) == self._bits - 1:
-            _data = list(_data)[1:]
-            return _data
-        return _data
+    def _process_buffer(self, buffer, only_page_element, format_return):
+        if only_page_element and format_return == 'dict':
+            return {'page': buffer[1], 'component': buffer[2]}
+        return list((buffer)[2:4] if only_page_element else (buffer)[1:])
+
+    def read(
+        self,
+        page_and_component:bool=False,
+        format_return:str='list'
+    ):
+        _buffer = self._uart.read()
+
+        if _buffer and len(list(_buffer)) == self._bits - 1:
+            return self._process_buffer(
+                buffer=_buffer,
+                only_page_element=page_and_component,
+                format_return=format_return
+            )
+        return _buffer
     
-    def write(self, command: str):
+    def write(self, command:str):
         _command = bytes(str(command), 'UTF-8')
         _base_command = b'\xff\xff\xff'
-        _buffer = _command + _base_command
-        self._uart.write(bytearray(_buffer))
+        _buffer_to_send = _command + _base_command
+        self._uart.write(bytearray(_buffer_to_send))
