@@ -252,9 +252,9 @@ class PIR:
         sleep(0.2)
         return self._value
 
-class NextionDisplays:
+class NextionDisplay:
     '''
-        display = NextionDisplays(tx=4, rx=5)
+        display = NextionDisplay(tx=4, rx=5)
         display.write("temp.txt='34 C'")
     '''
     def __init__(
@@ -272,7 +272,7 @@ class NextionDisplays:
     
     def _process_buffer(self, buffer, only_page_element, format_return):
         if only_page_element and format_return == 'dict':
-            return {'page': buffer[1], 'component': buffer[2]}
+            return {'component': buffer[2], 'page': buffer[1]}
         return list((buffer)[2:4] if only_page_element else (buffer)[1:])
 
     def read(
@@ -295,3 +295,4 @@ class NextionDisplays:
         _base_command = b'\xff\xff\xff'
         _buffer_to_send = _command + _base_command
         self._uart.write(bytearray(_buffer_to_send))
+
