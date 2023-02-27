@@ -234,12 +234,17 @@ class NeoPixel:
             raise ValueError('Matrix error')
         self._define_colors()
         self._n.write()
-        
+
     def off(self):
         self._matrix = self._create_base_matrix()
         self._define_colors()
         self._n.write()
         
-    def write_movement(self, matrix):
-        _base = self._create_base_matrix()
-        pass
+    def write_movement(self, matrix:str, wait:int=1):
+        for index, _ in enumerate(range(self._lenght)):
+            _base = self._create_base_matrix()
+            _base[index] = matrix
+            self._matrix = _base
+            self._define_colors()
+            self._n.write()
+            sleep(wait)
