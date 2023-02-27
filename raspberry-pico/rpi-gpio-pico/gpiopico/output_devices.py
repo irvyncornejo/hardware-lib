@@ -240,13 +240,20 @@ class NeoPixel:
         self._define_colors()
         self._n.write()
         
-    def write_movement(self, matrix:str, wait:float=1.0):
+    def write_movement(
+        self,
+        matrix:str,
+        wait:float=1.0,
+        reverse:bool=False
+    ) -> None:
+        def _get_index(index) -> int:
+            return -(index+1)
+
         for index, _ in enumerate(range(self._lenght)):
             _base = self._create_base_matrix()
-            _base[index] = matrix
+            _base[_get_index(index) if reverse else index] = matrix
             self._matrix = _base
             self._define_colors()
             self._n.write()
             sleep(wait)
         self.off()
-

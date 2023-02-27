@@ -48,6 +48,7 @@ GPIO control para raspberry pi pico
 - Motor DC
 - RGB
 - Servo motor
+- NeoPixel
 ### Descargar paquete
 ```
 pip install gpiopico
