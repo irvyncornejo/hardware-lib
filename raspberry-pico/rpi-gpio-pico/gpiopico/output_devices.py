@@ -1,6 +1,6 @@
 from umachine import Pin, PWM
 from utime import sleep
-from gpiopico.utils import AnalogicMap
+from gpiopico.utils import AnalogicMap, hex_to_rgb
 
 _SAMPLES: int = 65534
 
@@ -62,7 +62,8 @@ class FullDigitalControl:
     def __init__(
         self,
         pin: int,
-        inverted_logic: bool = False,
+        inverted_logic: bool=False,
+        limit_range:int=255,
         use_mapping: bool=True
     ) -> None:
         self._inverted_logic = inverted_logic
@@ -71,7 +72,7 @@ class FullDigitalControl:
         self._use_mapping = use_mapping
         self._mapping = AnalogicMap()
         self._range_map = (_SAMPLES, 0) if inverted_logic else (0, _SAMPLES)
-        self._limit_range = 255
+        self._limit_range =  limit_range
 
     @property
     def pwm_value(self):
@@ -113,8 +114,8 @@ class Relay(SimpleDigitalControl):
         super().__init__(pin, inverted_logic)
 
 class Led(FullDigitalControl):
-    def __init__(self, pin: int, inverted_logic: bool = False):
-        super().__init__(pin, inverted_logic)
+    def __init__(self, pin: int, inverted_logic: bool = False, limit_range:int=255):
+        super().__init__(pin, inverted_logic, limit_range)
 
 class SolidStateRelay(FullDigitalControl):
     def __init__(self, pin: int, inverted_logic: bool = False) -> None:
@@ -177,5 +178,32 @@ class Car:
         self._motor_b = Motor(motor_b[0], motor_b[1])
 
 class RGB:
-    #TODO Define class
-    pass
+    def __init__(
+        self,
+        pin_red:int,
+        pin_green:int,
+        pin_blue:int,
+        limit_range:int=255,
+        inverted_logic:bool=False,
+    ) -> None:
+        self._red = Led(pin=pin_red, inverted_logic=inverted_logic, limit_range=limit_range)
+        self._green = Led(pin=pin_green, inverted_logic=inverted_logic, limit_range=limit_range)
+        self._blue = Led(pin=pin_blue, inverted_logic=inverted_logic, limit_range=limit_range)
+
+    def define_color(
+        self,
+        red:int=None,
+        green:int=None,
+        blue:int=None,
+        color_hex:str=None
+    ) -> None:
+        if color_hex:
+            red, green, blue = hex_to_rgb(color_hex)
+        self._red.pwm_value(red)
+        self._green.pwm_value(green)
+        self._blue.pwm_value(blue)
+    
+    def off(self):
+        self._red.off()
+        self._green.off()
+        self._blue.off()
