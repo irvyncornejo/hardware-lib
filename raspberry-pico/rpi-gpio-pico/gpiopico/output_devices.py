@@ -1,3 +1,4 @@
+import neopixel
 from umachine import Pin, PWM
 from utime import sleep
 from gpiopico.utils import AnalogicMap, hex_to_rgb
@@ -207,3 +208,38 @@ class RGB:
         self._red.off()
         self._green.off()
         self._blue.off()
+
+class NeoPixel:
+    '''
+    # from gpiopico import NeoPixel
+    # neo_pixel = NeoPixel(15, 8)
+    # neo_pixel.write(['FF00FF','000000','FF00FF','000000','FF00FF','000000','FF05FF','000000'])
+    '''
+    def __init__(self, pin:int, lenght:int, matrix=[]) -> None:
+        self._lenght = lenght
+        self._pin = Pin(pin, Pin.OUT)
+        self._n = neopixel.NeoPixel(self._pin, lenght)
+        self._matrix = matrix
+    
+    def _create_base_matrix(self):
+        return ['000000' for _ in range(self._lenght)]
+    
+    def _define_colors(self):
+        for index, color in enumerate(self._matrix):
+            self._n[index] = hex_to_rgb(color)
+    
+    def write(self, matrix:None):
+        self._matrix = matrix if matrix else self._matrix
+        if len(matrix) != self._lenght:
+            raise ValueError('Matrix error')
+        self._define_colors()
+        self._n.write()
+        
+    def off(self):
+        self._matrix = self._create_base_matrix()
+        self._define_colors()
+        self._n.write()
+        
+    def write_movement(self, matrix):
+        _base = self._create_base_matrix()
+        pass
