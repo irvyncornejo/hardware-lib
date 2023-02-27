@@ -228,13 +228,13 @@ class NeoPixel:
         for index, color in enumerate(self._matrix):
             self._n[index] = hex_to_rgb(color)
     
-    def write(self, matrix:None):
+    def write(self, matrix=None):
         self._matrix = matrix if matrix else self._matrix
-        if len(matrix) != self._lenght:
+        if len(self._matrix) != self._lenght:
             raise ValueError('Matrix error')
         self._define_colors()
         self._n.write()
-
+        
     def off(self):
         self._matrix = self._create_base_matrix()
         self._define_colors()
