@@ -255,11 +255,12 @@ class PIR:
 
 class NextionDisplay:
     '''
-        display = NextionDisplay(tx=4, rx=5)
+        display = NextionDisplay(uart_number=1, tx=4, rx=5)
         display.write("temp.txt='34 C'")
     '''
     def __init__(
         self,
+        uart_number:int,
         tx:int,
         rx:int,
         bits:int=8,
@@ -268,7 +269,7 @@ class NextionDisplay:
         stop:int=1
     )->None:
         self._bits = bits
-        self._uart = UART(1, baudrate=baudrate, tx=Pin(tx), rx=Pin(rx))
+        self._uart = UART(uart_number, baudrate=baudrate, tx=Pin(tx), rx=Pin(rx))
         self._uart.init(bits=bits, parity=parity, stop=stop)
     
     def _process_buffer(self, buffer, only_page_element, format_return):
@@ -324,6 +325,23 @@ class ClockDS1307:
         second = int(input("second : "))
         return (year, month, date, day, hour, minute,second, 0)
     
-    def read_datetime(self)->tuple:
-        (year,month,date,day,hour,minute,second,p1) = self._rtc.datetime()
+    def read_datetime(self, format_return:str='tuple')->tuple:
+        if format_return != 'tuple':
+            (year,month,date,day,hour,minute,second,p1) = self._rtc.datetime()
+            try:
+                formats = {
+                    'str': f'{year}-{month}-{date}|{hour}:{minute}:{second}',
+                    'mapping': {
+                        'year': year,
+                        'month': month,
+                        'date': date,
+                        'day': day,
+                        'hour': hour,
+                        'minute': minute,
+                        'second': second
+                    }
+                }
+                return formats[format_return]
+            except KeyError:
+                return self._rtc.datetime()
         return self._rtc.datetime()
