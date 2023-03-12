@@ -23,7 +23,7 @@ setup(
     author_email = EMAIL,
     url = GITHUB_URL,
     keywords = ['raspberry-pi pico', 'rpi-pico'],
-    install_requires=[],
+    install_requires=['urtc'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
