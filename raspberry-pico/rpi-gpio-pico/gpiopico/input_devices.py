@@ -255,7 +255,7 @@ class PIR:
 
 class NextionDisplay:
     '''
-        display = NextionDisplay(uart_number=1, tx=4, rx=5)
+        display = NextionDisplay(tx=4, rx=5)
         display.write("temp.txt='34 C'")
     '''
     def __init__(
@@ -285,11 +285,15 @@ class NextionDisplay:
         _buffer = self._uart.read()
 
         if _buffer and len(list(_buffer)) == self._bits - 1:
+            #page and component
             return self._process_buffer(
                 buffer=_buffer,
                 only_page_element=page_and_component,
                 format_return=format_return
             )
+        if _buffer and len(list(_buffer)) == 4:
+            #slider
+            return list(_buffer)[0]
         return _buffer
     
     def write(self, command:str):
