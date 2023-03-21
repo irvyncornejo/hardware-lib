@@ -1,5 +1,5 @@
 from umachine import Pin, ADC, UART, I2C
-from utime import sleep
+from utime import sleep, sleep_ms
 from urtc import DS1307
 
 _VOLTAGE_REF: float = 3.3
@@ -160,6 +160,20 @@ class Joystick(AnalogicInputs):
 
 class LM35(AnalogicInputs):
     pass
+
+class RaspiTemp(AnalogicInputs):
+    def __init__(self, )->None:
+        super().__init__(4, _VOLTAGE_REF)
+    
+    def _read_value(self):
+        _voltaje = self.read_voltage()
+        temperature_celcius = 27 - (_voltaje - 0.706)/0.001721 
+        sleep_ms(500)
+        return temperature_celcius
+    
+    def read(self, samples:int=1)->float:
+        #TODO apply samples
+        return self._read_value()
 
 class Button:
     def __init__(
