@@ -77,7 +77,7 @@ class AnalogicInputs:
         adc_pin: int,
         voltage_ref: float = _VOLTAGE_REF
     ) -> None:
-        if adc_pin not in list(range(26,29)):
+        if adc_pin not in [4, 26, 27, 28]:
             raise ValueError('adc_pin defined it´s not analogic pin')
         self._input = ADC(adc_pin)
         self._conversion_factor = voltage_ref / _SAMPLES
