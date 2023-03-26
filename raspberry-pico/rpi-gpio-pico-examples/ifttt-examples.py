@@ -10,11 +10,10 @@ raspberry pico-w -> ifttt(webhook) -> spreadsheets (write values)
 url = '' #ifttt endpoint
 
 response = http.post(
-    url,
-    {"content-type": "application/json"},
-    {"value1":"567","value2":"890"},
-    'text'
+    url=url,
+    headers={"content-type": "application/json"},
+    body={"value1":"567","value2":"890"},
+    format_response='text'
 )
 
 print(response)
-
