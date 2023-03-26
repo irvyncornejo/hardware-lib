@@ -190,6 +190,7 @@ class Button:
 
     @staticmethod
     def _validate_callback(callback):
+        #TODO CHANGE TO INSTANCE
         if (
             type(callback).__name__ == 'function' or
             type(callback).__name__ == 'bound_method'
@@ -197,7 +198,6 @@ class Button:
             return
         else:
             raise ValueError('callback will be a function or bound_method')
-        
 
     @property
     def when_pressed(self):
@@ -247,6 +247,7 @@ class PIR:
     
     @when_motion_is_detected.setter
     def when_motion_is_detected(self, callback):
+        #TODO CHANGE TO INSTANCE
         if (
             type(callback).__name__ == 'function' or
             type(callback).__name__ == 'bound_method'
