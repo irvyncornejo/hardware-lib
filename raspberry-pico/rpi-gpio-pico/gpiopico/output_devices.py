@@ -65,10 +65,12 @@ class FullDigitalControl:
         pin: int,
         inverted_logic: bool=False,
         limit_range:int=255,
+        frequency:int=1000,
         use_mapping: bool=True
     ) -> None:
         self._inverted_logic = inverted_logic
         self._pin = PWM(Pin(pin))
+        self._pin.freq(frequency)
         self._pwm_value = 0
         self._use_mapping = use_mapping
         self._mapping = AnalogicMap()
@@ -211,31 +213,44 @@ class RGB:
 
 class NeoPixel:
     '''
+    Parameters:
+        :pin(int)
+        :length(int)
+        :matrix(list) -> ['000000', '000000', '000000', '000000', '000000', '000000', '000000', '000000']
+    
     # from gpiopico import NeoPixel
     # neo_pixel = NeoPixel(15, 8)
     # neo_pixel.write(['FF00FF','000000','FF00FF','000000','FF00FF','000000','FF05FF','000000'])
     '''
-    def __init__(self, pin:int, lenght:int, matrix=[]) -> None:
-        self._lenght = lenght
+    def __init__(self, pin:int, length:int, matrix=[]) -> None:
+        self._length = length
         self._pin = Pin(pin, Pin.OUT)
-        self._n = neopixel.NeoPixel(self._pin, lenght)
+        self._n = neopixel.NeoPixel(self._pin, length)
         self._matrix = matrix
     
     def _create_base_matrix(self):
-        return ['000000' for _ in range(self._lenght)]
+        '''Create a create a basic color matrix
+        '''
+        return ['000000' for _ in range(self._length)]
     
     def _define_colors(self):
+        ''' Get color in rgb for all elements
+        '''
         for index, color in enumerate(self._matrix):
             self._n[index] = hex_to_rgb(color)
     
     def write(self, matrix=None):
+        ''' Show elements in matrix
+        '''
         self._matrix = matrix if matrix else self._matrix
-        if len(self._matrix) != self._lenght:
+        if len(self._matrix) != self._length:
             raise ValueError('Matrix error')
         self._define_colors()
         self._n.write()
         
     def off(self):
+        '''
+        '''
         self._matrix = self._create_base_matrix()
         self._define_colors()
         self._n.write()
@@ -249,7 +264,7 @@ class NeoPixel:
         def _get_index(index) -> int:
             return -(index+1)
 
-        for index, _ in enumerate(range(self._lenght)):
+        for index, _ in enumerate(range(self._length)):
             _base = self._create_base_matrix()
             _base[_get_index(index) if reverse else index] = matrix
             self._matrix = _base
