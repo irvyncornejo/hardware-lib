@@ -154,7 +154,7 @@ class Motor:
             )
         self._pin_forward.on()
         self._pin_backward.off()
-    
+
     def backward(self, velocity=None) -> None:
         """
             :velocity(int) 0% - 100%
@@ -172,13 +172,54 @@ class Motor:
         self._pin_backward.off()
         sleep(0.5)
 
+
 class Car:
-    #TODO Create methods
     """Basic Car with two motors
+
+        :motor_a(tuple(int, int))
+        :motor_a(tuple(int, int))
+
+        from gpiopico import Car
+
+        car = Car((0, 1), (2, 3))
+        car.forward()
+        sleep(2)
+        car.backward()
+        sleep(2)
+        car.stop()
+
     """
     def __init__(self, motor_a:tuple, motor_b:tuple) -> None:
-        self._motor_a = Motor(motor_a[0], motor_a[1])
-        self._motor_b = Motor(motor_b[0], motor_b[1])
+        self.motor_a = Motor(motor_a[0], motor_a[1])
+        self.motor_b = Motor(motor_b[0], motor_b[1])
+
+    def forward(self, velocity=None) -> None:
+        """
+            :velocity(int) 0% - 100%
+        """
+        self.motor_a.forward(velocity)
+        self.motor_b.forward(velocity)
+
+    def backward(self, velocity=None) -> None:
+        """
+            :velocity(int) 0% - 100%
+        """
+        self.motor_a.backward(velocity)
+        self.motor_b.backward(velocity)
+
+    def stop(self)->None:
+        self.motor_a.stop()
+        self.motor_b.stop()
+        sleep(0.5)
+
+    def turn_left(self)->None:
+        self.motor_a.backward()
+        self.motor_b.forward()
+
+    def turn_right(self)->None:
+        self.motor_a.forward()
+        self.motor_b.backward()
+
 
 class RGB:
     def __init__(
