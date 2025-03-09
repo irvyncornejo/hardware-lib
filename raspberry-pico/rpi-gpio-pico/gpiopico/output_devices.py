@@ -116,13 +116,16 @@ class Relay(SimpleDigitalControl):
     def __init__(self, pin: int, inverted_logic: bool = False):
         super().__init__(pin, inverted_logic)
 
+
 class Led(FullDigitalControl):
     def __init__(self, pin: int, inverted_logic: bool = False, limit_range:int=255):
         super().__init__(pin, inverted_logic, limit_range)
 
+
 class SolidStateRelay(FullDigitalControl):
     def __init__(self, pin: int, inverted_logic: bool = False) -> None:
         super().__init__(pin, inverted_logic)
+
 
 class Motor:
     """
@@ -170,7 +173,7 @@ class Motor:
     def stop(self) -> None:
         self._pin_forward.off()
         self._pin_backward.off()
-        sleep(0.5)
+        sleep(0.3)
 
 
 class Car:
@@ -220,6 +223,58 @@ class Car:
         self.motor_a.forward()
         self.motor_b.backward()
 
+class ServoMotor:
+    """
+        :pin(int)
+        :frequency(int)
+        :angle_range(tuple(int, int))
+        :angle(int)
+        
+        from utime import sleep
+
+        from gpiopico import ServoMotor
+
+        servo_1 = ServoMotor(2)
+
+        ang = int(input('Ingresa el angulo: '))
+        servo_1.angle(ang)
+        sleep(1)
+        servo_1.mid()
+        sleep(3)
+        servo_1.min()
+        sleep(3)
+        servo_1.max()
+        sleep(1)
+    """
+    def __init__(
+        self,
+        pin:int,
+        frequency:int=50,
+        angle_range:tuple=(0, 180)
+    ) -> None:
+        self._pin = PWM(Pin(pin))
+        self._pin.freq(frequency)
+        self._angle_range = angle_range
+        self._angle = 0
+
+    def angle(self, angle:int):
+        if angle < self._angle_range[0] or angle > self._angle_range[1]:
+            print('Angle out of range')
+        self._angle = angle
+        duty = int(12.346*angle**2 + 7777.8*angle + 700000)
+        #duty /= 1000000
+        #duty = int(duty*1023/20)
+        self._pin.duty_ns(duty)
+
+    def max(self)->None:
+        self.angle(int(self._angle_range[1]))
+
+    def min(self)->None:
+        self.angle(int(self._angle_range[0]))
+
+    def mid(self)->None:
+        self.angle(int(self._angle_range[1]/2))
+
 
 class RGB:
     def __init__(
@@ -230,9 +285,20 @@ class RGB:
         limit_range:int=255,
         inverted_logic:bool=False,
     ) -> None:
-        self._red = Led(pin=pin_red, inverted_logic=inverted_logic, limit_range=limit_range)
-        self._green = Led(pin=pin_green, inverted_logic=inverted_logic, limit_range=limit_range)
-        self._blue = Led(pin=pin_blue, inverted_logic=inverted_logic, limit_range=limit_range)
+        self._led_red = Led(pin=pin_red, inverted_logic=inverted_logic, limit_range=limit_range)
+        self._led_green = Led(pin=pin_green, inverted_logic=inverted_logic, limit_range=limit_range)
+        self._led_blue = Led(pin=pin_blue, inverted_logic=inverted_logic, limit_range=limit_range)
+        self._red = None
+        self._green = None
+        self._blue = None
+
+    @property
+    def color(self):
+        return {
+            'red': self._red,
+            'green': self._green,
+            'blue': self._blue
+        }
 
     def define_color(
         self,
@@ -242,15 +308,21 @@ class RGB:
         color_hex:str=None
     ) -> None:
         if color_hex:
-            red, green, blue = hex_to_rgb(color_hex)
-        self._red.pwm_value(red)
-        self._green.pwm_value(green)
-        self._blue.pwm_value(blue)
-    
+            self._red, self._green, self._blue = hex_to_rgb(color_hex)
+        else:
+            self._red = red if red else self._red
+            self._green = green if green else self._green
+            self._blue = blue if blue else self._blue
+
+        self._led_red.pwm_value(self._red)
+        self._led_green.pwm_value(self._green)
+        self._led_blue.pwm_value(self._blue)
+
     def off(self):
-        self._red.off()
-        self._green.off()
-        self._blue.off()
+        self._led_red.off()
+        self._led_green.off()
+        self._led_blue.off()
+
 
 class NeoPixel:
     '''
@@ -263,34 +335,53 @@ class NeoPixel:
     # neo_pixel = NeoPixel(15, 8)
     # neo_pixel.write(['FF00FF','000000','FF00FF','000000','FF00FF','000000','FF05FF','000000'])
     '''
-    def __init__(self, pin:int, length:int, matrix=[]) -> None:
+    def __init__(self, pin:int, length:int, matrix:list=[]) -> None:
         self._length = length
         self._pin = Pin(pin, Pin.OUT)
         self._n = neopixel.NeoPixel(self._pin, length)
-        self._matrix = matrix
-    
+        self._matrix = self._create_base_matrix()
+        self.write_matrix(self._matrix)
+
     def _create_base_matrix(self):
-        '''Create a create a basic color matrix
         '''
-        return ['000000' for _ in range(self._length)]
-    
+            Create a create a basic color matrix
+        '''
+        return ['000000'] * self._length
+
     def _define_colors(self):
-        ''' Get color in rgb for all elements
+        '''
+            Get color in rgb for all elements
         '''
         for index, color in enumerate(self._matrix):
             self._n[index] = hex_to_rgb(color)
-    
-    def write(self, matrix=None):
-        ''' Show elements in matrix
+
+    def write_image(self, matrix=None):
+        '''
+            Show elements in matrix
         '''
         self._matrix = matrix if matrix else self._matrix
         if len(self._matrix) != self._length:
             raise ValueError('Matrix error')
         self._define_colors()
         self._n.write()
-        
+
+    def write_matrix(self, matrix):
+        '''
+            Show elements in matrix
+        '''
+        self._matrix = matrix
+        self._n.write()
+    
+    def write(self, index_element: int, color_element: str)->None:
+        '''
+            Write matrix base
+        '''
+        self._matrix[index_element] = color_element
+        self.write_matrix(self._matrix)
+
     def off(self):
         '''
+            Turn off all leds
         '''
         self._matrix = self._create_base_matrix()
         self._define_colors()
@@ -313,3 +404,4 @@ class NeoPixel:
             self._n.write()
             sleep(wait)
         self.off()
+

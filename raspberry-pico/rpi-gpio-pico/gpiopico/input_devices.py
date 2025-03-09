@@ -143,7 +143,13 @@ class Joystick(AnalogicInputs):
     def _run_event(self):
         if not self._button.value() and self._function_after_press:
             self._function_after_press()
-    
+
+    def get_values(self):
+        return (
+            self._input_x.read_u16() * self._conversion_factor,
+            self._input_y.read_u16() * self._conversion_factor
+        )
+
     def get_direction(self):
         self._rx_value = self._input_x.read_u16()
         self._ry_value = self._input_y.read_u16()
