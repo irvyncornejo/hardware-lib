@@ -11,10 +11,6 @@ class Network:
         self.ip = self._connect(ssid, password)
         self._response = None
         self._format = 'json'
-    
-    def _set_url(self, url:str):
-        """TODO query params"""
-        pass
 
     def _connect(self, ssid:str, password:str)->str:
         wlan = network.WLAN(network.STA_IF)
@@ -34,23 +30,27 @@ class Network:
         elif self._format == 'text':
             return self._response.text
         return self._response
-    
-    def put(self):
-        """TODO"""
-        pass
-    
-    def delete(self):
-        """TODO"""
-        pass
-    
-    def get(self, url:str, format_response:str='json'):
-        print(f'Get {url}')
+
+    def put(self, url:str, headers={}, params={}, body={}, format_response:str='json'):
+        print(f'PUT {url} - body {body}')
         self._format = format_response
-        self._response = urequests.get(url)
+        self._response = urequests.put(url, headers=headers, json=body, headers=headers, params=params)
         return self._format_return()
     
-    def post(self, url:str, headers={}, body={}, format_response:str='json'):
+    def delete(self, url:str, headers={}, params={}, body={}, format_response:str='json'):
+        print(f'DELETE {url} - body {body}')
+        self._format = format_response
+        self._response = urequests.delete(url, headers=headers, json=body, headers=headers, params=params)
+        return self._format_return()
+    
+    def get(self, url:str, headers={}, params={}, format_response:str='json'):
+        print(f'Get {url}')
+        self._format = format_response
+        self._response = urequests.get(url, headers=headers, params=params)
+        return self._format_return()
+
+    def post(self, url:str, headers={}, params={}, body={}, format_response:str='json'):
         print(f'Post {url} - body {body}')
         self._format = format_response
-        self._response = urequests.post(url, headers=headers, json=body)
+        self._response = urequests.post(url, headers=headers, json=body, headers=headers, params=params)
         return self._format_return()
